@@ -71,7 +71,6 @@ type ReqHeader struct {
     CAS uint64
 }
 
-
 func newReqHeader(buf []byte) *ReqHeader {
 
     fmt.Printf("req: %v\n", buf)
