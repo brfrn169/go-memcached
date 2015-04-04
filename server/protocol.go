@@ -6,7 +6,6 @@ import (
     "errors"
 
     "github.com/brfrn169/go-memcached/util"
-    "fmt"
 )
 
 const headerSize = 24
@@ -72,9 +71,6 @@ type ReqHeader struct {
 }
 
 func newReqHeader(buf []byte) *ReqHeader {
-
-    fmt.Printf("req: %v\n", buf)
-
     return &ReqHeader{
         Opcode: buf[1],
         KeyLength: binary.BigEndian.Uint16(buf[2:4]),
@@ -123,8 +119,6 @@ func WriteRes(conn *net.TCPConn, opcode byte, status uint16, opaque []byte, cas 
     if value != nil {
         copy(res[(headerSize + uint16(flagsLen) + keyLen):], value)
     }
-
-    fmt.Printf("res: %v\n", res)
 
     _, err := conn.Write(res)
     return err

@@ -14,7 +14,6 @@ func main() {
 
     // TODO handle command line argument
 
-
     s := server.NewServer("localhost:11211")
     s.Start()
 

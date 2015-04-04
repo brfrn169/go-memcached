@@ -13,6 +13,8 @@ type ItemService struct {
 }
 
 func NewItemService() *ItemService {
+    // TODO expire thread
+
     var hashArraySize uint32 = 1024 // TODO make it configurable
     return &ItemService{
         hashArraySize: hashArraySize,
@@ -46,6 +48,7 @@ func (s *ItemService) Set(key []byte, value []byte, flags []byte, expiry uint32)
             }
         }
     }
+    
     return nil
 }
 
@@ -62,7 +65,6 @@ func (s *ItemService) Get(key []byte) *Item {
         }
     }
 
-    // it's no way
     return nil
 }
 

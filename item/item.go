@@ -9,12 +9,11 @@ type Item struct {
     Value []byte
     Flags []byte
     Cas uint64
-    expiry uint64
+    Expiry uint64
     next *Item
 }
 
 func newItem(key []byte, value []byte, flags []byte, expiry uint32) *Item {
-
     var e uint64
     if expiry > 0 {
         e = util.GetNowMillis() + uint64(expiry)
@@ -25,6 +24,6 @@ func newItem(key []byte, value []byte, flags []byte, expiry uint32) *Item {
         Value: value,
         Flags :flags,
         Cas: uint64(1),
-        expiry: e,
+        Expiry: e,
     }
 }
