@@ -35,20 +35,19 @@ func (s *ItemService) Set(key []byte, value []byte, flags []byte, expiry uint32)
     if s.hashArray[index] == nil {
         s.hashArray[index] = newItem(key, value, flags, expiry)
         return s.hashArray[index]
-    } else {
-        for it := s.hashArray[index]; it != nil; it = it.next {
-            if bytes.Equal(it.Key, key) {
-                it.Value = value
-                it.Flags = flags
-                it.Cas += 1
-                return it
-            } else if it.next == nil {
-                it.next = newItem(key, value, flags, expiry)
-                return it.next
-            }
+    }
+    for it := s.hashArray[index]; it != nil; it = it.next {
+        if bytes.Equal(it.Key, key) {
+            it.Value = value
+            it.Flags = flags
+            it.CAS += 1
+            return it
+        } else if it.next == nil {
+            it.next = newItem(key, value, flags, expiry)
+            return it.next
         }
     }
-    
+
     return nil
 }
 

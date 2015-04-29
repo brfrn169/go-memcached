@@ -11,7 +11,7 @@ import (
 
 type RequestProcessor struct {
     conn *net.TCPConn
-    is *item.ItemService
+    itemService *item.ItemService
     wCh chan writeRequest
 }
 
@@ -25,10 +25,10 @@ type writeRequest struct {
     value []byte
 }
 
-func NewRequestProcessor(conn *net.TCPConn, is *item.ItemService) *RequestProcessor {
+func NewRequestProcessor(conn *net.TCPConn, itemService *item.ItemService) *RequestProcessor {
     return &RequestProcessor {
         conn: conn,
-        is: is,
+        itemService: itemService,
         wCh: make(chan writeRequest),
     }
 }
@@ -40,6 +40,7 @@ func (rp *RequestProcessor) Start() {
 
 func (rp *RequestProcessor) processRead() {
     defer rp.conn.Close()
+    defer close(rp.wCh)
 
     for {
         rh, err := ReadReqHeader(rp.conn)
@@ -96,13 +97,16 @@ func (rp *RequestProcessor) processWrite() {
     defer rp.conn.Close()
 
     for {
-        wr := <-rp.wCh
+        wr, more := <-rp.wCh
+
+        if !more {
+            return
+        }
+
         err := WriteRes(rp.conn, wr.opcode, wr.status, wr.opaque, wr.cas, wr.flags, wr.key, wr.value)
         if err != nil {
-            if err != nil {
-                fmt.Printf("Write Error [%v]: %v\n", rp.conn.RemoteAddr(), err)
-                return
-            }
+            fmt.Printf("Write Error [%v]: %v\n", rp.conn.RemoteAddr(), err)
+            return
         }
 
         fmt.Printf("write opaque [%v]: %v\n", rp.conn.RemoteAddr(), wr.opaque)
@@ -112,7 +116,7 @@ func (rp *RequestProcessor) processWrite() {
 func (rp *RequestProcessor) get(rh *ReqHeader, key []byte) {
     // TODO status
 
-    i := rp.is.Get(key)
+    i := rp.itemService.Get(key)
 
 //    fmt.Printf("key:%v, value:%v, flags:%v, cas:%v\n", i.Key, i.Value, i.Flags, i.Cas)
 
@@ -120,7 +124,7 @@ func (rp *RequestProcessor) get(rh *ReqHeader, key []byte) {
         opcode: OpGet,
         status: StatusNoError,
         opaque: rh.Opaque,
-        cas: i.Cas,
+        cas: i.CAS,
         flags: i.Flags,
         key: nil,
         value: i.Value,
@@ -132,13 +136,13 @@ func (rp *RequestProcessor) set(rh *ReqHeader, key []byte, value []byte, flags [
 
 //    fmt.Printf("key:%v, value:%v, flags:%v, expiry:%v\n", key, value, flags, expiry)
 
-    i := rp.is.Set(key, value, flags, expiry)
+    i := rp.itemService.Set(key, value, flags, expiry)
 
     rp.wCh <- writeRequest {
         opcode: OpSet,
         status: StatusNoError,
         opaque: rh.Opaque,
-        cas: i.Cas,
+        cas: i.CAS,
         flags: nil,
         key: nil,
         value: nil,

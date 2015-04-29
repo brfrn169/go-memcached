@@ -8,7 +8,7 @@ type Item struct {
     Key []byte
     Value []byte
     Flags []byte
-    Cas uint64
+    CAS uint64
     Expiry uint64
     next *Item
 }
@@ -23,7 +23,7 @@ func newItem(key []byte, value []byte, flags []byte, expiry uint32) *Item {
         Key: key,
         Value: value,
         Flags :flags,
-        Cas: uint64(1),
+        CAS: uint64(1),
         Expiry: e,
     }
 }

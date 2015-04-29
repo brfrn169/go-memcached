@@ -11,14 +11,13 @@ import (
 
 type Server struct {
     laddr string
-    is *item.ItemService
-
+    itemService *item.ItemService
 }
 
 func NewServer(laddr string) *Server {
     return &Server{
         laddr: laddr,
-        is: item.NewItemService(),
+        itemService: item.NewItemService(),
     }
 }
 
@@ -49,7 +48,7 @@ func (s *Server) Service() {
         }
 
         // TODO limit number of connection
-        rp := NewRequestProcessor(conn.(*net.TCPConn), s.is)
+        rp := NewRequestProcessor(conn.(*net.TCPConn), s.itemService)
         rp.Start()
     }
 }
