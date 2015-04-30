@@ -40,7 +40,7 @@ func (s *ItemService) Set(key []byte, value []byte, flags []byte, expiry uint32)
 		if bytes.Equal(it.Key, key) {
 			it.Value = value
 			it.Flags = flags
-			it.CAS += 1
+			//			it.CAS += 1
 			return it
 		} else if it.next == nil {
 			it.next = newItem(key, value, flags, expiry)

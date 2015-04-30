@@ -109,22 +109,21 @@ func (rp *RequestProcessor) processWrite() {
 			return
 		}
 
-		fmt.Printf("write opaque [%v]: %v\n", rp.conn.RemoteAddr(), wr.opaque)
+		//		fmt.Printf("write opaque [%v]: %v\n", rp.conn.RemoteAddr(), wr.opaque)
 	}
 }
 
 func (rp *RequestProcessor) get(rh *ReqHeader, key []byte) {
-	// TODO status
-
 	i := rp.itemService.Get(key)
 
 	//    fmt.Printf("key:%v, value:%v, flags:%v, cas:%v\n", i.Key, i.Value, i.Flags, i.Cas)
 
+	// TODO status
 	rp.wCh <- writeRequest{
 		opcode: OpGet,
 		status: StatusNoError,
 		opaque: rh.Opaque,
-		cas:    i.CAS,
+		cas:    0, /*i.CAS*/
 		flags:  i.Flags,
 		key:    nil,
 		value:  i.Value,
@@ -132,17 +131,19 @@ func (rp *RequestProcessor) get(rh *ReqHeader, key []byte) {
 }
 
 func (rp *RequestProcessor) set(rh *ReqHeader, key []byte, value []byte, flags []byte, expiry uint32) {
-	// TODO cas, status
+	// TODO cas
 
 	//    fmt.Printf("key:%v, value:%v, flags:%v, expiry:%v\n", key, value, flags, expiry)
 
-	i := rp.itemService.Set(key, value, flags, expiry)
+	//	i := rp.itemService.Set(key, value, flags, expiry)
+	rp.itemService.Set(key, value, flags, expiry)
 
+	// TODO status
 	rp.wCh <- writeRequest{
 		opcode: OpSet,
 		status: StatusNoError,
 		opaque: rh.Opaque,
-		cas:    i.CAS,
+		cas:    0, /*i.CAS*/
 		flags:  nil,
 		key:    nil,
 		value:  nil,

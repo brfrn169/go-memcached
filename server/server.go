@@ -22,12 +22,11 @@ func NewServer(laddr string) *Server {
 }
 
 func (s *Server) Start() {
-	fmt.Println("start")
 	go s.Service()
 }
 
 func (s *Server) Service() {
-	listener, err := net.Listen("tcp", "localhost:11211")
+	listener, err := net.Listen("tcp", s.laddr)
 	if err != nil {
 		fmt.Printf("Listen Error: %v\n", err)
 		os.Exit(1)

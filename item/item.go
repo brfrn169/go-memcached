@@ -5,10 +5,10 @@ import (
 )
 
 type Item struct {
-	Key    []byte
-	Value  []byte
-	Flags  []byte
-	CAS    uint64
+	Key   []byte
+	Value []byte
+	Flags []byte
+	//	CAS    uint64
 	Expiry uint64
 	next   *Item
 }
@@ -20,10 +20,10 @@ func newItem(key []byte, value []byte, flags []byte, expiry uint32) *Item {
 	}
 
 	return &Item{
-		Key:    key,
-		Value:  value,
-		Flags:  flags,
-		CAS:    uint64(1),
+		Key:   key,
+		Value: value,
+		Flags: flags,
+		//		CAS:    uint64(1),
 		Expiry: e,
 	}
 }
